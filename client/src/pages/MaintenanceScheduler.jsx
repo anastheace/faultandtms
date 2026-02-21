@@ -15,7 +15,7 @@ const MaintenanceScheduler = () => {
         const fetchSchedules = async () => {
             try {
                 const config = { headers: { 'x-auth-token': token } };
-                const res = await axios.get('http://localhost:5000/api/maintenance', config);
+                const res = await axios.get('/api/maintenance', config);
                 setSchedules(res.data);
             } catch (error) {
                 console.error("Error fetching schedules", error);
@@ -28,14 +28,14 @@ const MaintenanceScheduler = () => {
         e.preventDefault();
         try {
             const config = { headers: { 'x-auth-token': token } };
-            const res = await axios.post('http://localhost:5000/api/maintenance', formData, config);
+            const res = await axios.post('/api/maintenance', formData, config);
 
             setSchedules([{ ...formData, id: Date.now(), status: 'pending' }, ...schedules]); // Optimistic
             setIsFormOpen(false);
             setFormData({ pcNumber: '', scheduledDate: '', description: '' });
 
             // Re-fetch to get correct IDs
-            const refreshRes = await axios.get('http://localhost:5000/api/maintenance', config);
+            const refreshRes = await axios.get('/api/maintenance', config);
             setSchedules(refreshRes.data);
         } catch (error) {
             console.error("Error creating schedule", error);
@@ -45,7 +45,7 @@ const MaintenanceScheduler = () => {
     const handleComplete = async (id) => {
         try {
             const config = { headers: { 'x-auth-token': token } };
-            await axios.put(`http://localhost:5000/api/maintenance/${id}/status`, { status: 'completed' }, config);
+            await axios.put(`/api/maintenance/${id}/status`, { status: 'completed' }, config);
 
             setSchedules(schedules.map(sch =>
                 sch.id === id ? { ...sch, status: 'completed' } : sch

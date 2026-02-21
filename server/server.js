@@ -23,8 +23,11 @@ const path = require('path');
 // Serve static frontend files in production
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Default Route
-app.get('/', (req, res) => {
+// React Router Fallback: Send all other unhandled requests to the React app
+app.use((req, res, next) => {
+    if (req.path.startsWith('/api')) {
+        return next();
+    }
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 

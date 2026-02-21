@@ -12,7 +12,7 @@ const TechnicianPanel = () => {
         const fetchTickets = async () => {
             try {
                 const config = { headers: { 'x-auth-token': token } };
-                const res = await axios.get('http://localhost:5000/api/tickets', config);
+                const res = await axios.get('/api/tickets', config);
                 // Filter tickets assigned to this technician. 
                 // Using 'Demo Tech' as a fallback if the username doesn't strictly match the assignment during demo.
                 const assigned = res.data.filter(t => t.assignedTo === user.name || t.assignedTo === 'Demo Tech' || t.status === 'in_progress');
@@ -27,7 +27,7 @@ const TechnicianPanel = () => {
     const updateStatus = async (id, newStatus) => {
         try {
             const config = { headers: { 'x-auth-token': token } };
-            await axios.put(`http://localhost:5000/api/tickets/${id}/status`, { status: newStatus }, config);
+            await axios.put(`/api/tickets/${id}/status`, { status: newStatus }, config);
             setTickets(tickets.map(t => t.id === id ? { ...t, status: newStatus } : t));
         } catch (error) {
             console.error("Error updating ticket status", error);

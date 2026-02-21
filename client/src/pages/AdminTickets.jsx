@@ -16,8 +16,8 @@ const AdminTickets = () => {
         const fetchData = async () => {
             try {
                 const config = { headers: { 'x-auth-token': token } };
-                const resTickets = await axios.get('http://localhost:5000/api/tickets', config);
-                const resTechs = await axios.get('http://localhost:5000/api/auth/technicians', config);
+                const resTickets = await axios.get('/api/tickets', config);
+                const resTechs = await axios.get('/api/auth/technicians', config);
                 setTickets(resTickets.data);
                 setTechnicians(resTechs.data);
             } catch (error) {
@@ -30,7 +30,7 @@ const AdminTickets = () => {
     const handleAssign = async (ticketId, techId) => {
         try {
             const config = { headers: { 'x-auth-token': token } };
-            await axios.put(`http://localhost:5000/api/tickets/${ticketId}/assign`, { techId: parseInt(techId) }, config);
+            await axios.put(`/api/tickets/${ticketId}/assign`, { techId: parseInt(techId) }, config);
 
             const selectedTech = technicians.find(t => t.id === parseInt(techId));
 

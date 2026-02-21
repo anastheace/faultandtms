@@ -52,9 +52,9 @@ const Dashboard = () => {
             try {
                 const config = { headers: { 'x-auth-token': token } };
                 const [ticketsRes, maintRes, usageRes] = await Promise.all([
-                    axios.get('http://localhost:5000/api/tickets', config),
-                    axios.get('http://localhost:5000/api/maintenance', config),
-                    axios.get('http://localhost:5000/api/usage/logs', config)
+                    axios.get('/api/tickets', config),
+                    axios.get('/api/maintenance', config),
+                    axios.get('/api/usage/logs', config)
                 ]);
 
                 const tickets = ticketsRes.data;

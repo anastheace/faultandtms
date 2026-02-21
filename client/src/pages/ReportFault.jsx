@@ -39,7 +39,7 @@ const ReportFault = () => {
                 description: formData.description
             });
 
-            const res = await axios.post('http://localhost:5000/api/tickets', body, config);
+            const res = await axios.post('/api/tickets', body, config);
 
             setSubmitStatus({
                 type: 'success',

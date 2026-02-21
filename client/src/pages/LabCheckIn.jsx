@@ -26,7 +26,7 @@ const LabCheckIn = () => {
             const body = { pcNumber };
 
             const endpoint = action === 'login' ? '/api/usage/login' : '/api/usage/logout';
-            const res = await axios.post(`http://localhost:5000${endpoint}`, body, config);
+            const res = await axios.post(`${endpoint}`, body, config);
 
             setStatus({
                 type: 'success',
