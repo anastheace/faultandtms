@@ -1,0 +1,65 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #000000;
+  color: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000000;
+  min-height: 100vh;
+}
+
+::selection {
+  background-color: #e11d48;
+  color: #ffffff;
+}
+
+/* Glassmorphism effect for dark mode cards and panels */
+.glass-panel {
+  background-color: rgba(5, 5, 5, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 25px 30px -5px rgba(0, 0, 0, 0.8), 0 10px 15px -6px rgba(0, 0, 0, 0.6);
+}
+
+/* Smooth, modern shadow for dark theme */
+.cool-shadow {
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+/* Gradient text */
+.text-gradient {
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(to right, #fb7185, #e11d48);
+  /* rose gradients */
+  color: transparent;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #334155;
+  /* slate-700 */
+  border-radius: 9999px;
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #475569;
+  /* slate-600 */
+}
