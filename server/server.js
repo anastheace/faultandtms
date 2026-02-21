@@ -18,8 +18,14 @@ app.use('/api/usage', require('./routes/usageRoutes'));
 app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
 // app.use('/api/users', require('./routes/userRoutes'));
 
-app.get('/', (req, res) => {
-    res.send('Fault and Ticket Management System API is running');
+const path = require('path');
+
+// Serve static frontend files in production
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// Send all other requests to the React app
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 app.listen(PORT, () => {
