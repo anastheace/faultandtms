@@ -24,7 +24,7 @@ const path = require('path');
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Send all other requests to the React app
-app.get('*', (req, res) => {
+app.get('(.*)', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
