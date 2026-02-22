@@ -28,12 +28,14 @@ const Layout = () => {
             { to: '/report', icon: <Monitor className="w-4 h-4" />, label: 'Report Fault' }
         ],
         staff: [
-            { to: '/checkin', icon: <MonitorPlay className="w-4 h-4" />, label: 'Lab Check-in' },
-            { to: '/report', icon: <Monitor className="w-4 h-4" />, label: 'Report Fault' }
+            { to: '/checkin', icon: <MonitorPlay className="w-4 h-4" />, label: 'Staff Lab Check-in' },
+            { to: '/report', icon: <Monitor className="w-4 h-4" />, label: 'Report Lab Fault' }
         ]
     };
 
     const userLinks = user ? navLinks[user.role] || [] : [];
+
+    const displayRole = user?.role === 'student' ? 'Student Portal' : user?.role === 'staff' ? 'Staff Portal' : user?.role;
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -63,7 +65,7 @@ const Layout = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-100 leading-tight">{user.name}</p>
-                                        <p className="text-xs text-rose-400/80 capitalize">{user.role}</p>
+                                        <p className="text-xs text-rose-400/80 capitalize">{displayRole}</p>
                                     </div>
                                 </div>
                                 <button onClick={handleLogout} className="group p-2 rounded-lg hover:bg-rose-500/10 hover:text-rose-400 transition-colors" title="Logout">
@@ -85,7 +87,7 @@ const Layout = () => {
                 <AnimatePresence>
                     {isMobileMenuOpen && user && (
                         <motion.div
-                            initial={{ opactiy: 0, height: 0 }}
+                            initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: 'auto' }}
                             exit={{ opacity: 0, height: 0 }}
                             className="md:hidden w-full bg-slate-900/95 backdrop-blur-xl border-t border-white/5 absolute top-[100%] left-0 shadow-2xl overflow-hidden"
@@ -98,7 +100,7 @@ const Layout = () => {
                                     </div>
                                     <div>
                                         <p className="text-sm font-semibold text-slate-100">{user.name}</p>
-                                        <p className="text-xs text-rose-400/80 capitalize">{user.role}</p>
+                                        <p className="text-xs text-rose-400/80 capitalize">{displayRole}</p>
                                     </div>
                                 </div>
 

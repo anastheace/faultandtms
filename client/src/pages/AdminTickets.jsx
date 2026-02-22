@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
-import { motion } from 'framer-motion';
-import { Ticket, Search, AlertTriangle, CheckCircle2, PlayCircle, Clock } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Ticket, Search, AlertTriangle, CheckCircle2, PlayCircle, Clock, Info, X } from 'lucide-react';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 
@@ -11,6 +11,7 @@ const AdminTickets = () => {
     const [tickets, setTickets] = useState([]);
     const [technicians, setTechnicians] = useState([]);
     const [filterStatus, setFilterStatus] = useState('all');
+    const [selectedTicketInfo, setSelectedTicketInfo] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -154,8 +155,17 @@ const AdminTickets = () => {
                                             <span className="inline-block w-1.5 h-1.5 rounded-full bg-slate-600"></span> {ticket.pc}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 text-sm text-slate-300 max-w-xs truncate">
-                                        {ticket.issue}
+                                    <td className="px-6 py-4 text-sm text-slate-300">
+                                        <div className="flex items-center justify-between gap-2 max-w-xs">
+                                            <span className="truncate">{ticket.issue}</span>
+                                            <button
+                                                onClick={() => setSelectedTicketInfo(ticket)}
+                                                className="flex-shrink-0 text-xs px-2 py-1 bg-slate-700/50 hover:bg-rose-500/20 text-rose-400 border border-slate-600 hover:border-rose-500/30 rounded-md flex items-center gap-1 transition-colors"
+                                                title="Issue Overview"
+                                            >
+                                                <Info className="w-3.5 h-3.5" /> Overview
+                                            </button>
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm capitalize">
                                         <span className={getPriorityColor(ticket.priority)}>{ticket.priority}</span>
@@ -192,6 +202,75 @@ const AdminTickets = () => {
                     </div>
                 )}
             </div>
+
+            {/* Issue Overview Modal */}
+            <AnimatePresence>
+                {selectedTicketInfo && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-0 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col"
+                        >
+                            <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-center">
+                                <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                    <Info className="w-5 h-5 text-indigo-400" />
+                                    Detailed Issue Overview
+                                </h3>
+                                <button
+                                    onClick={() => setSelectedTicketInfo(null)}
+                                    className="p-2 -mr-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="p-6 overflow-y-auto flex-grow bg-slate-900/50 max-h-[60vh]">
+                                <div className="space-y-4 mb-6">
+                                    <div>
+                                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">User's Detailed Issue Text</p>
+                                        <p className="text-slate-300 bg-slate-800/80 p-4 rounded-xl border border-slate-700/50 leading-relaxed min-h-[100px] shadow-inner text-sm md:text-base whitespace-pre-wrap">
+                                            {selectedTicketInfo.description}
+                                        </p>
+                                    </div>
+                                    <div className="mb-4">
+                                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Ticket ID</div>
+                                        <div className="text-sm font-medium text-rose-400 bg-slate-900 inline-block px-2.5 py-1 rounded-md border border-slate-700">#{selectedTicketInfo.id}</div>
+                                    </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4 mb-6">
+                                    <div>
+                                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Reported By</div>
+                                        <div className="text-sm font-medium text-slate-200">{selectedTicketInfo.user}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Workstation</div>
+                                        <div className="text-sm font-medium text-slate-200">{selectedTicketInfo.pc}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Priority</div>
+                                        <div className="text-sm font-medium capitalize flex items-center gap-2">
+                                            <span className={getPriorityColor(selectedTicketInfo.priority)}>{selectedTicketInfo.priority}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Status</div>
+                                        <div className="mt-1">{getStatusBadge(selectedTicketInfo.status)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="px-6 py-4 border-t border-slate-700/50 bg-slate-800/80 flex justify-end">
+                                <button
+                                    onClick={() => setSelectedTicketInfo(null)}
+                                    className="px-5 py-2 text-sm font-semibold text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

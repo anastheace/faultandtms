@@ -1,10 +1,11 @@
 import { useState, useEffect, useContext } from 'react';
-import { motion } from 'framer-motion';
-import { Ticket, CheckCircle, Wrench, Calendar, Monitor, FileText, Activity } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Ticket, CheckCircle, Wrench, Calendar, Monitor, FileText, Activity, X } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 const usageData = [
     { name: 'Mon', usage: 120 },
     { name: 'Tue', usage: 150 },
@@ -15,10 +16,15 @@ const usageData = [
     { name: 'Sun', usage: 40 },
 ];
 
+const parseDBDate = (dateStr) => {
+    if (!dateStr) return null;
+    return new Date(dateStr.includes(' ') ? dateStr.replace(' ', 'T') + 'Z' : dateStr);
+};
+
 const formatDuration = (start, end) => {
     if (!end) return '-';
     // Simplified duration
-    const diff = Math.floor((new Date(end) - new Date(start)) / 1000 / 60);
+    const diff = Math.floor((parseDBDate(end) - parseDBDate(start)) / 1000 / 60);
     return `${diff} mins`;
 };
 
@@ -44,7 +50,10 @@ const Dashboard = () => {
     const [stats, setStats] = useState({ total: 0, pending: 0, resolved: 0, activePCs: 0 });
     const [maintenanceLogs, setMaintenanceLogs] = useState([]);
     const [usageLogs, setUsageLogs] = useState([]);
+    const [allUsageLogs, setAllUsageLogs] = useState([]);
+    const [showLogModal, setShowLogModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchDashboardData = async () => {
@@ -68,6 +77,7 @@ const Dashboard = () => {
                 setStats({ total, pending, resolved, activePCs });
                 setMaintenanceLogs(maintRes.data.slice(0, 4));
                 setUsageLogs(logs.slice(0, 5));
+                setAllUsageLogs(logs);
             } catch (err) {
                 console.error("Failed to load dashboard data", err);
             } finally {
@@ -181,14 +191,17 @@ const Dashboard = () => {
                                     </div>
                                     <div className="text-right">
                                         <span className="text-xs font-medium text-rose-400 bg-rose-500/10 px-2 py-1 rounded-md border border-rose-500/20">
-                                            {format(new Date(item.scheduled_date), 'MMM dd')}
+                                            {format(parseDBDate(item.scheduled_date), 'MMM dd')}
                                         </span>
                                     </div>
                                 </div>
                             ))}
                     </div>
 
-                    <button className="mt-6 w-full py-2.5 text-sm font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-colors">
+                    <button
+                        onClick={() => navigate('/maintenance')}
+                        className="mt-6 w-full py-2.5 text-sm font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl transition-colors"
+                    >
                         View Full Schedule
                     </button>
                 </motion.div>
@@ -226,7 +239,7 @@ const Dashboard = () => {
                                         <span className="bg-slate-800 text-rose-400 px-2.5 py-1 rounded-md border border-slate-700">{log.computer_id}</span>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
-                                        {format(new Date(log.login_time), 'hh:mm a')}
+                                        {format(parseDBDate(log.login_time), 'hh:mm a')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                                         {!log.logout_time ? (
@@ -235,7 +248,7 @@ const Dashboard = () => {
                                                 Active Now
                                             </span>
                                         ) : (
-                                            <span className="text-slate-400">{format(new Date(log.logout_time), 'hh:mm a')}</span>
+                                            <span className="text-slate-400">{format(parseDBDate(log.logout_time), 'hh:mm a')}</span>
                                         )}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
@@ -246,8 +259,95 @@ const Dashboard = () => {
                         </tbody>
                     </table>
                     {usageLogs.length === 0 && <p className="text-slate-500 text-sm text-center py-4">No recent usage logs.</p>}
+
+                    {usageLogs.length > 0 && (
+                        <div className="mt-4 flex justify-center">
+                            <button
+                                onClick={() => setShowLogModal(true)}
+                                className="px-6 py-2 text-sm font-semibold text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-xl transition-colors"
+                            >
+                                View Full Log
+                            </button>
+                        </div>
+                    )}
                 </div>
             </motion.div>
+
+            {/* Full Logs Modal */}
+            <AnimatePresence>
+                {showLogModal && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 sm:px-0 bg-slate-900/60 backdrop-blur-sm">
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                            className="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh]"
+                        >
+                            <div className="p-6 border-b border-slate-700/50 bg-slate-800 flex justify-between items-center">
+                                <h3 className="text-xl font-bold text-slate-100 flex items-center gap-2">
+                                    <FileText className="w-5 h-5 text-rose-500" />
+                                    Complete PC Usage Logs
+                                </h3>
+                                <button
+                                    onClick={() => setShowLogModal(false)}
+                                    className="p-2 -mr-2 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                            <div className="overflow-auto bg-slate-900/50 p-6 flex-grow">
+                                <table className="w-full text-left border-collapse">
+                                    <thead>
+                                        <tr className="bg-slate-800/80 border-b border-slate-700">
+                                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">User</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Workstation</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Check-in Time</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Check-out Time</th>
+                                            <th className="px-6 py-4 text-xs font-semibold text-slate-400 uppercase tracking-wider">Duration</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-700/50">
+                                        {allUsageLogs.map((log) => (
+                                            <tr key={log.id} className="hover:bg-slate-800/40 transition-colors">
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-200">
+                                                    {log.user_name}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                                                    <span className="bg-slate-800 text-rose-400 px-2.5 py-1 rounded-md border border-slate-700">{log.computer_id}</span>
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-400">
+                                                    {format(parseDBDate(log.login_time), 'MMM dd, yyyy hh:mm a')}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm">
+                                                    {!log.logout_time ? (
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                                            Active Now
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-slate-400">{format(parseDBDate(log.logout_time), 'hh:mm a')}</span>
+                                                    )}
+                                                </td>
+                                                <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+                                                    {formatDuration(log.login_time, log.logout_time)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div className="px-6 py-4 border-t border-slate-700/50 bg-slate-800/80 flex justify-end">
+                                <button
+                                    onClick={() => setShowLogModal(false)}
+                                    className="px-5 py-2 text-sm font-semibold text-slate-300 bg-slate-700 hover:bg-slate-600 rounded-xl transition-colors"
+                                >
+                                    Close Logs
+                                </button>
+                            </div>
+                        </motion.div>
+                    </div>
+                )}
+            </AnimatePresence>
         </motion.div>
     );
 };

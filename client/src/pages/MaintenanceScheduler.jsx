@@ -5,6 +5,11 @@ import { format } from 'date-fns';
 import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 
+const parseDBDate = (dateStr) => {
+    if (!dateStr) return null;
+    return new Date(dateStr.includes(' ') ? dateStr.replace(' ', 'T') + 'Z' : dateStr);
+};
+
 const MaintenanceScheduler = () => {
     const { token } = useContext(AuthContext);
     const [schedules, setSchedules] = useState([]);
@@ -24,19 +29,23 @@ const MaintenanceScheduler = () => {
         if (token) fetchSchedules();
     }, [token]);
 
+    const [showSuccessToast, setShowSuccessToast] = useState(false);
+
     const handleCreate = async (e) => {
         e.preventDefault();
         try {
             const config = { headers: { 'x-auth-token': token } };
             const res = await axios.post('/api/maintenance', formData, config);
 
-            setSchedules([{ ...formData, id: Date.now(), status: 'pending' }, ...schedules]); // Optimistic
-            setIsFormOpen(false);
-            setFormData({ pcNumber: '', scheduledDate: '', description: '' });
-
-            // Re-fetch to get correct IDs
+            // Fetch to ensure we get the full generated data instead of optimistic pushing which might cause missing keys and crash
             const refreshRes = await axios.get('/api/maintenance', config);
             setSchedules(refreshRes.data);
+
+            setIsFormOpen(false);
+            setFormData({ pcNumber: '', scheduledDate: '', description: '' });
+            setShowSuccessToast(true);
+            setTimeout(() => setShowSuccessToast(false), 3000);
+
         } catch (error) {
             console.error("Error creating schedule", error);
         }
@@ -59,8 +68,22 @@ const MaintenanceScheduler = () => {
         <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="w-full space-y-6"
+            className="w-full space-y-6 relative"
         >
+            <AnimatePresence>
+                {showSuccessToast && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20, scale: 0.9 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -20, scale: 0.9 }}
+                        className="fixed top-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-emerald-500 text-white px-4 py-3 rounded-xl shadow-lg shadow-emerald-500/20 font-medium"
+                    >
+                        <CheckCircle2 className="w-5 h-5" />
+                        Saved successfully!
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
                 <div>
                     <h2 className="text-3xl font-bold text-slate-100 tracking-tight">Maintenance Scheduler</h2>
@@ -175,7 +198,7 @@ const MaintenanceScheduler = () => {
                                 >
                                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-300 flex items-center gap-2">
                                         <CalendarIcon className="w-4 h-4 text-slate-500" />
-                                        {format(new Date(item.scheduled_date), 'MMM dd, yyyy')}
+                                        {format(parseDBDate(item.scheduled_date), 'MMM dd, yyyy')}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <span className="text-sm font-medium text-rose-400 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md">{item.computer_id || item.pc_number}</span>

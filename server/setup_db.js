@@ -91,10 +91,15 @@ const initializeDatabase = () => {
         const techPw = bcrypt.hashSync('tech123', salt);
 
         // 1. Insert Users
+        const tharunPw = bcrypt.hashSync('tharun123', salt);
+        const rajeshPw = bcrypt.hashSync('rajesh123', salt);
+        const susuPw = bcrypt.hashSync('susu123', salt);
+
         db.run("INSERT INTO users (name, email, password, role) VALUES ('Admin User', 'admin@tms.com', ?, 'admin')", [adminPw]);
-        db.run("INSERT INTO users (name, email, password, role) VALUES ('Test Student', 'student@tms.com', ?, 'student')", [studentPw]);
-        db.run("INSERT INTO users (name, email, password, role) VALUES ('Sam Technician', 'sam@tms.com', ?, 'technician')", [techPw]);
-        db.run("INSERT INTO users (name, email, password, role) VALUES ('Sara Technician', 'sara@tms.com', ?, 'technician')", [techPw]);
+        db.run("INSERT INTO users (name, email, password, role) VALUES ('Student', 'student@tms.com', ?, 'student')", [studentPw]);
+        db.run("INSERT INTO users (name, email, password, role) VALUES ('Rajesh Technician', 'rajesh@tms.com', ?, 'technician')", [rajeshPw]); // ID 3
+        db.run("INSERT INTO users (name, email, password, role) VALUES ('Tharun Technician', 'tharun@tms.com', ?, 'technician')", [tharunPw]); // ID 4
+        db.run("INSERT INTO users (name, email, password, role) VALUES ('Susu Screenshot Collector', 'susu@tms.com', ?, 'technician')", [susuPw]); // ID 5
 
         // Ensure technicians exist before adding tickets assigned to them
         setTimeout(() => {
@@ -140,25 +145,25 @@ const initializeDatabase = () => {
 
             // Tickets (Wide variety of issues)
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (3, 2, 3, 'Hardware', 'Monitor is flickering and showing green lines', 'high', 'in_progress')`); // Sam
+                        VALUES (3, 2, 3, 'Hardware', 'Monitor is flickering and showing green lines', 'high', 'in_progress')`); // ID 1
             db.run(`INSERT INTO tickets (computer_id, reported_by, issue_category, description, priority, status) 
-                        VALUES (10, 2, 'Network', 'Cannot connect to university Wi-Fi or Ethernet', 'medium', 'open')`); // Unassigned
+                        VALUES (10, 2, 'Network', 'Cannot connect to university Wi-Fi or Ethernet', 'medium', 'open')`); // ID 2
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (12, 2, 4, 'Hardware', 'Motherboard beeping on startup, fan is extremely loud', 'critical', 'open')`); // Sara
+                        VALUES (12, 2, 4, 'Hardware', 'Motherboard beeping on startup, fan is extremely loud', 'critical', 'resolved')`); // ID 3 - Tharun
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (5, 2, 4, 'Software', 'Adobe Premiere Pro crashes immediately on startup', 'low', 'resolved')`); // Sara
+                        VALUES (5, 2, 5, 'Software', 'whatsapp bug', 'low', 'in_progress')`); // ID 4 - Susu
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (1, 2, 3, 'Software', 'Anaconda Navigator not launching, python path error', 'medium', 'open')`); // Sam
+                        VALUES (1, 2, 3, 'Software', 'Anaconda Navigator not launching, python path error', 'medium', 'open')`); // ID 5
             db.run(`INSERT INTO tickets (computer_id, reported_by, issue_category, description, priority, status) 
-                        VALUES (7, 2, 'Hardware', 'Missing keyboard keys (Spacebar and Enter)', 'low', 'open')`); // Unassigned
+                        VALUES (7, 2, 'Hardware', 'Missing keyboard keys (Spacebar and Enter)', 'low', 'open')`); // ID 6
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (4, 2, 3, 'Network', 'DNS Resolution failed, cannot access internal gitlab', 'high', 'resolved')`); // Sam
+                        VALUES (4, 2, 3, 'Network', 'DNS Resolution failed, cannot access internal gitlab', 'high', 'resolved')`); // ID 7
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (2, 2, 4, 'Other', 'Blue Screen of Death showing MEMORY_MANAGEMENT error', 'critical', 'in_progress')`); // Sara
+                        VALUES (2, 2, 4, 'Other', 'Blue Screen of Death showing MEMORY_MANAGEMENT error', 'critical', 'in_progress')`); // ID 8
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (8, 2, 3, 'Software', 'Visual Studio requires an admin password to update workloads', 'medium', 'open')`); // Sam
+                        VALUES (8, 2, 3, 'Software', 'Visual Studio requires an admin password to update workloads', 'medium', 'resolved')`); // ID 9 - Rajesh
             db.run(`INSERT INTO tickets (computer_id, reported_by, assigned_to, issue_category, description, priority, status) 
-                        VALUES (11, 2, 4, 'Hardware', 'Mouse laser not tracking properly on the specific desk surface', 'low', 'resolved')`); // Sara
+                        VALUES (11, 2, 4, 'Hardware', 'Mouse laser not tracking properly on the specific desk surface', 'low', 'resolved')`); // ID 10
             db.run(`INSERT INTO tickets (computer_id, reported_by, issue_category, description, priority, status) 
                         VALUES (9, 2, 'Other', 'Chair at this workstation is broken and dangerous', 'medium', 'open')`); // Unassigned
 

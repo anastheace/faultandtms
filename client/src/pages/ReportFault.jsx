@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -15,8 +15,28 @@ const ReportFault = () => {
     const [submitStatus, setSubmitStatus] = useState({ type: '', message: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    useEffect(() => {
+        // Auto-generate PC number for student/staff on mount
+        if (user && (user.role === 'student' || user.role === 'staff')) {
+            const savedPc = localStorage.getItem('tms_active_pc');
+            if (savedPc) {
+                setFormData(prev => ({ ...prev, pcNumber: savedPc }));
+            } else {
+                const randomLab = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
+                const randomNum = Math.floor(Math.random() * 20) + 1;
+                const paddedNum = randomNum.toString().padStart(2, '0');
+                const newPc = `PC-${randomLab}-${paddedNum}`;
+                setFormData(prev => ({ ...prev, pcNumber: newPc }));
+                localStorage.setItem('tms_active_pc', newPc);
+            }
+        }
+    }, [user]);
+
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
+        if (e.target.name === 'pcNumber') {
+            localStorage.setItem('tms_active_pc', e.target.value);
+        }
     };
 
     const handleSubmit = async (e) => {

@@ -39,9 +39,11 @@ const Login = () => {
                 className="glass-panel w-full max-w-md p-8 sm:p-10 rounded-2xl relative z-10 border border-slate-700/50 bg-slate-800/80 backdrop-blur-xl"
             >
                 <div className="flex flex-col items-center mb-8">
-                    <div className="bg-gradient-to-br from-indigo-500 to-purple-600 p-3 rounded-2xl shadow-lg shadow-indigo-900/20 mb-4">
-                        <Monitor className="text-white w-8 h-8" />
-                    </div>
+                    <img
+                        src="/tms_logo.svg"
+                        alt="TMS Logo"
+                        className="h-24 w-auto object-contain drop-shadow-lg mb-6 hover:scale-105 transition-transform duration-300"
+                    />
                     <h2 className="text-3xl font-bold text-slate-100 tracking-tight">Welcome Back</h2>
                     <p className="text-slate-400 mt-2 text-center text-sm">Login to the TMS Lab Management System</p>
                 </div>
@@ -95,11 +97,6 @@ const Login = () => {
                         )}
                     </button>
                 </form>
-
-                <div className="mt-8 text-center text-sm text-slate-400">
-                    <p>Demo Accounts:</p>
-                    <p className="mt-1"><code className="bg-black px-1.5 py-0.5 rounded border border-slate-700">admin@tms.com</code> | <code className="bg-black px-1.5 py-0.5 rounded border border-slate-700">student@tms.com</code></p>
-                </div>
             </motion.div>
         </div>
     );

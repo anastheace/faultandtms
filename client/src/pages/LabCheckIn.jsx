@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import axios from 'axios';
 import AuthContext from '../context/AuthContext';
 import { motion } from 'framer-motion';
@@ -9,6 +9,23 @@ const LabCheckIn = () => {
     const [pcNumber, setPcNumber] = useState('');
     const [status, setStatus] = useState({ type: '', message: '' });
     const [isLoading, setIsLoading] = useState(false);
+
+    useEffect(() => {
+        // Auto-generate PC number for student/staff on mount if not already checked in
+        if (user && (user.role === 'student' || user.role === 'staff')) {
+            const savedPc = localStorage.getItem('tms_active_pc');
+            if (savedPc) {
+                setPcNumber(savedPc);
+            } else {
+                const randomLab = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
+                const randomNum = Math.floor(Math.random() * 20) + 1;
+                const paddedNum = randomNum.toString().padStart(2, '0');
+                const newPc = `PC-${randomLab}-${paddedNum}`;
+                setPcNumber(newPc);
+                localStorage.setItem('tms_active_pc', newPc);
+            }
+        }
+    }, [user]);
 
     const handleAction = async (action) => {
         if (!pcNumber.trim()) {
@@ -32,7 +49,12 @@ const LabCheckIn = () => {
                 type: 'success',
                 message: `Successfully ${action === 'login' ? 'checked in to' : 'checked out of'} ${pcNumber}.`
             });
-            if (action === 'logout') setPcNumber('');
+            if (action === 'logout') {
+                setPcNumber('');
+                localStorage.removeItem('tms_active_pc');
+            } else if (action === 'login') {
+                localStorage.setItem('tms_active_pc', pcNumber); // Explicitly lock it in if they manually typed it
+            }
         } catch (error) {
             console.error(`Error during ${action}:`, error);
             setStatus({
@@ -81,7 +103,10 @@ const LabCheckIn = () => {
                         <input
                             type="text"
                             value={pcNumber}
-                            onChange={(e) => setPcNumber(e.target.value)}
+                            onChange={(e) => {
+                                setPcNumber(e.target.value);
+                                localStorage.setItem('tms_active_pc', e.target.value); // Sync manual changes
+                            }}
                             className="w-full px-4 py-3 rounded-xl border border-slate-700 bg-slate-800/50 focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all font-medium text-xl text-center uppercase tracking-wider text-slate-100 placeholder-slate-600"
                             placeholder="LAB-A-PC01"
                         />
