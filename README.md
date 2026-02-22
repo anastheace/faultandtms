@@ -1,4 +1,5 @@
-# TMS Labs - Fault & Ticket Management System
+# OG Stable Cloud: TMS Smart Trip
+
 
 Welcome to the Fault and Ticket Management System, a full-stack React + Node.js application built for administrators, technicians, and students to flawlessly track hardware, manage software repair tickets, and schedule maintenance across PC labs.
 
@@ -15,24 +16,20 @@ Welcome to the Fault and Ticket Management System, a full-stack React + Node.js 
 *   **Backend**: Node.js, Express.js, SQLite (Local database), bcrypt (Auth)
 
 ## 🔑 Demo Credentials
-The SQLite database comes pre-seeded with highly varied test data. You can log into any of the roles below using the password `xxx123` or `admin123`/`student123`/`tech123` depending on the seed version.
+The SQLite database comes pre-seeded with highly varied test data. You can log into any of the roles below using these exact credentials:
 
-1.  **Admin:** `admin@tms.com`
-2.  **Student:** `student@tms.com`
-3.  **Technicians:** `sam@tms.com` and `sara@tms.com`
+1.  **Admin:** `admin@tms.com` (pw: `anas123`)
+2.  **Student:** `student@tms.com` (pw: `student123`)
+3.  **Staff:** `staff@tms.com` (pw: `staff123`)
+4.  **Technicians:** `rajesh@tms.com` (pw: `rajesh123`), `tharun@tms.com` (pw: `tharun123`), `susu@tms.com` (pw: `susu123`)
 
-## 🛠️ Deployment (Render & Vercel)
+## 🛠️ Deployment (Single-Click Monorepo)
 
-### **Frontend (Vercel)**
-Because the frontend is a pure React static export, it is highly optimized for Vercel. 
-1. Push this repository to GitHub. 
-2. Import the repository into Vercel. 
-3. Change the Build command to `cd client && npm run build` and the Out dir to `client/dist`.
+The OG Stable Cloud release has been fully perfectly refactored to host **both** the frontend React static files and the backend Express API from a single Node.js runtime environment.
 
-### **Backend (Render.com)**
-Because Vercel Serverless Functions will delete the local `TMS.db` SQLite file on every request, host the backend Express server on Render Web Services.
-1. Link your GitHub to Render.
-2. Select this Repo, set Root Dir to `.`.
-3. Build Command: `cd server && npm install`
-4. Start Command: `cd server && node server.js`
-*(Remember to update the Frontend Axios URLs to match your live Render API URL!)*
+### **Deploying to Render**
+Because we included a root `package.json` and a `render.yaml` Blueprint file, deployment is instant:
+1. Push this repository to GitHub.
+2. Log into Render.com.
+3. Click **New +** > **Blueprint**.
+4. Connect the repository. Render will automatically detect the configuration, build the React bundle, and start the Express server seamlessly on a single Web Service!
