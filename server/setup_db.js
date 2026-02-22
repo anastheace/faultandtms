@@ -82,7 +82,7 @@ const initializeDatabase = () => {
     `);
 
     // Insert Seed Data
-    db.get('SELECT id FROM users WHERE email = ?', ['admin123'], (err, row) => {
+    db.get('SELECT id FROM users WHERE email = ?', ['admin@tms.com'], (err, row) => {
       if (!row) {
         const bcrypt = require('bcryptjs');
         const salt = bcrypt.genSaltSync(10);
@@ -95,7 +95,7 @@ const initializeDatabase = () => {
         const rajeshPw = bcrypt.hashSync('rajesh123', salt);
         const susuPw = bcrypt.hashSync('susu123', salt);
 
-        db.run("INSERT INTO users (name, email, password, role) VALUES ('Anas', 'admin123', ?, 'admin')", [adminPw]);
+        db.run("INSERT INTO users (name, email, password, role) VALUES ('Anas', 'admin@tms.com', ?, 'admin')", [adminPw]);
         db.run("INSERT INTO users (name, email, password, role) VALUES ('Student', 'student@tms.com', ?, 'student')", [studentPw]);
         db.run("INSERT INTO users (name, email, password, role) VALUES ('Rajesh Technician', 'rajesh@tms.com', ?, 'technician')", [rajeshPw]); // ID 3
         db.run("INSERT INTO users (name, email, password, role) VALUES ('Tharun Technician', 'tharun@tms.com', ?, 'technician')", [tharunPw]); // ID 4
