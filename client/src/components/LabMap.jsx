@@ -17,27 +17,14 @@ const LabMap = ({ activeToken }) => {
             try {
                 const config = { headers: { 'x-auth-token': activeToken } };
                 const [compRes, ticketRes, usageRes] = await Promise.all([
-                    axios.get('/api/tickets', config), // Re-using ticket endpoint since we don't have a dedicated computer endpoint yet, we'll map from usage/tickets
+                    axios.get('/api/usage/computers', config),
                     axios.get('/api/tickets', config),
                     axios.get('/api/usage/logs', config)
                 ]);
 
                 setTickets(ticketRes.data);
                 setUsage(usageRes.data);
-
-                // Mocking full computer list since we need to visualize the whole lab
-                const mockComputers = [
-                    { id: 1, computer_id: 'LAB-A-01', lab: 'Lab A' },
-                    { id: 2, computer_id: 'LAB-A-02', lab: 'Lab A' },
-                    { id: 3, computer_id: 'LAB-A-05', lab: 'Lab A' },
-                    { id: 4, computer_id: 'LAB-B-01', lab: 'Lab B' },
-                    { id: 5, computer_id: 'LAB-B-07', lab: 'Lab B' },
-                    { id: 6, computer_id: 'LAB-B-11', lab: 'Lab B' },
-                    { id: 7, computer_id: 'LAB-C-04', lab: 'Lab C' },
-                    { id: 8, computer_id: 'LAB-C-09', lab: 'Lab C' },
-                    { id: 9, computer_id: 'LAB-D-12', lab: 'Lab D' }
-                ];
-                setComputers(mockComputers);
+                setComputers(compRes.data);
                 setIsLoading(false);
             } catch (err) {
                 console.error("Failed to fetch map data", err);
@@ -64,7 +51,7 @@ const LabMap = ({ activeToken }) => {
     const getStatusStyles = (state) => {
         switch (state) {
             case 'fault': return 'bg-red-500/20 border-red-500 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.5)] animate-pulse cursor-pointer';
-            case 'in_use': return 'bg-emerald-500/20 border-emerald-500 text-emerald-400 opacity-90';
+            case 'in_use': return 'bg-emerald-500/20 border-emerald-500 text-emerald-400 opacity-90 cursor-pointer shadow-[0_0_10px_rgba(16,185,129,0.3)]';
             case 'available': return 'bg-slate-800/50 border-slate-700 text-slate-500 hover:border-slate-500 transition-colors cursor-pointer';
             default: return 'bg-slate-800/50 border-slate-700 text-slate-500';
         }
@@ -109,7 +96,7 @@ const LabMap = ({ activeToken }) => {
                                 return (
                                     <div
                                         key={pc.id}
-                                        onClick={() => (status.state === 'fault' || status.state === 'available') && setSelectedPC({ pc, status })}
+                                        onClick={() => setSelectedPC({ pc, status })}
                                         className={`relative aspect-square rounded-lg border-2 flex flex-col items-center justify-center p-2 transition-all ${getStatusStyles(status.state)}`}
                                     >
                                         <Monitor className="w-6 h-6 mb-1 opacity-80" />
@@ -154,19 +141,42 @@ const LabMap = ({ activeToken }) => {
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 mt-6">
                                             <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
-                                                <span className="block text-xs text-slate-500 mb-1">Category</span>
-                                                <span className="text-sm font-medium text-slate-300">{selectedPC.status.data.issue_category}</span>
+                                                <span className="block text-xs text-slate-500 mb-1">Reporter</span>
+                                                <span className="text-sm font-medium text-slate-300 capitalize">{selectedPC.status.data.user}</span>
                                             </div>
                                             <div className="bg-slate-900/50 p-3 rounded-lg border border-slate-700">
+                                                <span className="block text-xs text-slate-500 mb-1">Category</span>
+                                                <span className="text-sm font-medium text-slate-300">{selectedPC.status.data.issue}</span>
+                                            </div>
+                                            <div className="col-span-2 bg-slate-900/50 p-3 rounded-lg border border-slate-700 mt-2">
                                                 <span className="block text-xs text-slate-500 mb-1">Assigned Tech</span>
-                                                <span className="text-sm font-medium text-slate-300">{selectedPC.status.data.assigned_to || 'Pending'}</span>
+                                                <span className="text-sm font-medium text-slate-300">{selectedPC.status.data.assignedTo || 'Pending'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : selectedPC.status.state === 'in_use' ? (
+                                    <div className="text-center py-6">
+                                        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
+                                            <Monitor className="w-8 h-8 text-emerald-400" />
+                                        </div>
+                                        <h4 className="text-lg font-bold text-emerald-400 mb-1">Active Session</h4>
+                                        <p className="text-slate-300 text-sm mb-6">This workstation is currently in use.</p>
+
+                                        <div className="bg-slate-900/50 p-4 rounded-xl border border-slate-700 text-left">
+                                            <div className="flex justify-between items-center mb-3">
+                                                <span className="text-slate-500 text-xs uppercase tracking-wider">Logged In User</span>
+                                                <span className="text-emerald-400 text-sm font-bold capitalize px-3 py-1 bg-emerald-400/10 rounded-full">{selectedPC.status.data.user_name} ({selectedPC.status.data.role})</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-slate-500 text-xs uppercase tracking-wider">Session Start</span>
+                                                <span className="text-slate-300 text-sm">{format(new Date(selectedPC.status.data.login_time + 'Z'), 'PPp')}</span>
                                             </div>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="text-center py-8">
-                                        <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
-                                            <Monitor className="w-8 h-8 text-emerald-400" />
+                                        <div className="w-16 h-16 rounded-full bg-slate-700/30 border border-slate-600 flex items-center justify-center mx-auto mb-4">
+                                            <Monitor className="w-8 h-8 text-slate-400" />
                                         </div>
                                         <h4 className="text-lg font-bold text-slate-200 mb-2">Workstation Available</h4>
                                         <p className="text-slate-400 text-sm">This PC is currently operational and ready for deployment.</p>

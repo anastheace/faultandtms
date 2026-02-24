@@ -84,4 +84,14 @@ const getUsageLogs = (req, res) => {
     });
 };
 
-module.exports = { loginPC, logoutPC, getUsageLogs };
+// @desc    Get all computers for Lab Map
+// @route   GET /api/usage/computers
+// @access  Private (Admin)
+const getAllComputers = (req, res) => {
+    db.all("SELECT * FROM computers ORDER BY lab_number, computer_id", [], (err, rows) => {
+        if (err) return res.status(500).json({ message: 'Server Error fetching computers' });
+        res.json(rows);
+    });
+};
+
+module.exports = { loginPC, logoutPC, getUsageLogs, getAllComputers };
