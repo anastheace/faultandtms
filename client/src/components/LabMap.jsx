@@ -62,11 +62,24 @@ const LabMap = ({ activeToken }) => {
 
     if (isLoading) return <div className="animate-pulse h-64 bg-slate-800/50 rounded-2xl w-full"></div>;
 
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1 }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15, scale: 0.9 },
+        visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 300, damping: 20 } }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-panel border-slate-700/50 p-6 rounded-2xl relative overflow-hidden"
+            className="glass-panel border-slate-700/50 p-6 rounded-2xl relative overflow-hidden max-w-[1600px] mx-auto w-full"
         >
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -86,28 +99,39 @@ const LabMap = ({ activeToken }) => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex flex-wrap justify-center gap-6 xl:gap-8 items-start"
+            >
                 {labs.map(labName => (
-                    <div key={labName} className="bg-slate-900/40 border border-slate-800 rounded-xl p-4">
-                        <h4 className="text-slate-400 font-semibold mb-4 text-sm tracking-wider uppercase">{labName}</h4>
-                        <div className="grid grid-cols-2 gap-3">
+                    <motion.div variants={itemVariants} key={labName} className="bg-slate-900/40 border border-slate-800 rounded-xl p-5 w-full sm:max-w-sm md:max-w-md shadow-lg hover:shadow-slate-800/50 transition-shadow">
+                        <h4 className="text-slate-400 font-bold mb-4 text-sm tracking-widest uppercase flex items-center gap-2">
+                            <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>
+                            {labName}
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-2 gap-3 xl:gap-4">
                             {computers.filter(c => c.lab === labName).map(pc => {
                                 const status = getPCStatus(pc.computer_id);
                                 return (
-                                    <div
+                                    <motion.div
+                                        variants={itemVariants}
+                                        whileHover={{ scale: 1.05, y: -2 }}
+                                        whileTap={{ scale: 0.95 }}
                                         key={pc.id}
                                         onClick={() => setSelectedPC({ pc, status })}
-                                        className={`relative aspect-square rounded-lg border-2 flex flex-col items-center justify-center p-2 transition-all ${getStatusStyles(status.state)}`}
+                                        className={`relative aspect-square rounded-xl border-2 flex flex-col items-center justify-center p-2 transition-all cursor-pointer backdrop-blur-sm shadow-md hover:shadow-xl ${getStatusStyles(status.state)}`}
                                     >
-                                        <Monitor className="w-6 h-6 mb-1 opacity-80" />
-                                        <span className="text-[10px] font-bold tracking-tight text-center">{pc.computer_id.split('-').pop()}</span>
-                                    </div>
+                                        <Monitor className="w-7 h-7 mb-2 opacity-90 drop-shadow-md" />
+                                        <span className="text-xs font-bold tracking-wider text-center drop-shadow-sm">{pc.computer_id.split('-').pop()}</span>
+                                    </motion.div>
                                 )
                             })}
                         </div>
-                    </div>
+                    </motion.div>
                 ))}
-            </div>
+            </motion.div>
 
             {/* PC Detail Modal */}
             <AnimatePresence>
