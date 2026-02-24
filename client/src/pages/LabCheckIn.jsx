@@ -20,7 +20,7 @@ const LabCheckIn = () => {
                 const randomLab = ['A', 'B', 'C'][Math.floor(Math.random() * 3)];
                 const randomNum = Math.floor(Math.random() * 20) + 1;
                 const paddedNum = randomNum.toString().padStart(2, '0');
-                const newPc = `PC-${randomLab}-${paddedNum}`;
+                const newPc = `LAB-${randomLab}-${paddedNum}`;
                 setPcNumber(newPc);
                 localStorage.setItem('tms_active_pc', newPc);
             }

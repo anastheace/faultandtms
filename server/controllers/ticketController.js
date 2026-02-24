@@ -64,7 +64,16 @@ const createTicket = (req, res) => {
 // @access  Private
 const getTickets = (req, res) => {
     const sql = `
-        SELECT t.id, c.computer_id as pc, u1.name as user, t.issue_category as issue, 
+        SELECT t.id, c.computer_id as pc, 
+               CASE 
+                   WHEN u1.id = 99 THEN 'Auto Telemetry'
+                   WHEN u1.role = 'student' THEN 'Student'
+                   WHEN u1.role = 'staff' THEN 'Staff'
+                   WHEN u1.role = 'admin' THEN 'Admin'
+                   WHEN u1.role = 'technician' THEN 'Technician'
+                   ELSE u1.role 
+               END as user, 
+               t.issue_category as issue, 
                t.description, t.status, t.priority, u2.name as assignedTo
         FROM tickets t
         JOIN computers c ON t.computer_id = c.id

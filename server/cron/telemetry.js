@@ -8,7 +8,7 @@ const automatedTicketCache = new Map();
 const generateSimulatedTemp = () => Math.floor(Math.random() * (95 - 40 + 1)) + 40;
 
 const runHardwareTelemetry = () => {
-    // Run this telemetry sweep every 12 hours
+    // Run this telemetry sweep every 48 hours (2 Days)
     setInterval(() => {
         // Fetch all active operational computers
         db.all("SELECT id, computer_id FROM computers WHERE status = 'operational'", [], (err, computers) => {
@@ -31,8 +31,8 @@ const runHardwareTelemetry = () => {
                     const lastAlertTime = automatedTicketCache.get(pc.computer_id);
                     const now = Date.now();
 
-                    // Only generate a new automated ticket if one hasn't been made in the last 12 hours
-                    if (!lastAlertTime || (now - lastAlertTime) > (12 * 60 * 60 * 1000)) { // 12 hour cooldown per PC
+                    // Only generate a new automated ticket if one hasn't been made in the last 48 hours
+                    if (!lastAlertTime || (now - lastAlertTime) > (48 * 60 * 60 * 1000)) { // 48 hour cooldown per PC
                         const description = `[AUTOMATED TELEMETRY ALERT] Critical Thermal Event Detected. CPU Core Temp exceeded safety thresholds (${currentTemp}°C). Immediate hardware diagnostic required.`;
 
                         // Insert the automated ticket 
@@ -57,7 +57,7 @@ const runHardwareTelemetry = () => {
                 }
             });
         });
-    }, 12 * 60 * 60 * 1000); // 12 hours in milliseconds
+    }, 48 * 60 * 60 * 1000); // 48 hours in milliseconds
 };
 
 module.exports = runHardwareTelemetry;
