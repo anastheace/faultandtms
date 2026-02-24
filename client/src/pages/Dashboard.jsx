@@ -6,6 +6,7 @@ import AuthContext from '../context/AuthContext';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import LabMap from '../components/LabMap';
 const usageData = [
     { name: 'Mon', usage: 120 },
     { name: 'Tue', usage: 150 },
@@ -131,6 +132,11 @@ const Dashboard = () => {
                     colorClass="text-rose-400 bg-rose-500/10 border border-rose-500/20"
                     delay={0.4}
                 />
+            </div>
+
+            {/* Interactive Lab Digital Twin Map */}
+            <div className="mt-6">
+                <LabMap activeToken={token} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
