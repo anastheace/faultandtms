@@ -1,5 +1,6 @@
 # OG Stable Cloud: TMS Smart Trip
 
+> **🏆 Stable Version Tagged:** This repository has been explicitly tagged at the `stable-3dmap-10sec-ping` release. This represents the perfectly stable, flawlessly integrated 12-node 3D map with the 10-second automated telemetry ping loop. You can always revert to this exact state by running `git checkout stable-3dmap-10sec-ping`.
 
 Welcome to the Fault and Ticket Management System, a full-stack React + Node.js application built for administrators, technicians, and students to flawlessly track hardware, manage software repair tickets, and schedule maintenance across PC labs.
 
