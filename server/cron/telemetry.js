@@ -67,10 +67,10 @@ const runSimulatedTraffic = () => {
     setInterval(() => {
         // --- RENDER WAKE-UP PING ---
         // Render Free Tier spins down after 15 mins of no *incoming HTTP traffic*. 
-        // Internal setTimeout/DB queries do NOT count. We must explicitly ping our own public URL.
+        // We must ping a PUBLIC, UNAUTHENTICATED route so it doesn't fail with a 401 error.
         const appUrl = process.env.RENDER_EXTERNAL_URL || 'http://localhost:5000';
-        axios.get(`${appUrl}/api/usage/computers`)
-            .then(() => console.log(`[Self-Ping] Successfully pinged ${appUrl} to prevent Render sleep timer.`))
+        axios.get(`${appUrl}/`)
+            .then(() => console.log(`[Self-Ping] Successfully pinged public route ${appUrl}/ to prevent Render sleep timer.`))
             .catch(err => console.error(`[Self-Ping Failed] Could not ping ${appUrl}:`, err.message));
 
         // 1. Get the generic Student user
