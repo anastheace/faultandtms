@@ -42,7 +42,7 @@ const LabMap = ({ activeToken }) => {
         const activeFault = tickets.find(t => t.computer_id === computerId && (t.status === 'open' || t.status === 'in_progress'));
         if (activeFault) return { state: 'fault', data: activeFault };
 
-        const activeUsage = usage.find(u => u.computer_id === computerId && !u.logout_time);
+        const activeUsage = usage.find(u => u.computer_id === computerId && !u.logout_time && ['student', 'staff'].includes(u.role.toLowerCase()));
         if (activeUsage) return { state: 'in_use', data: activeUsage };
 
         return { state: 'available', data: null };
@@ -58,7 +58,7 @@ const LabMap = ({ activeToken }) => {
     };
 
     // Grouping computers by Lab
-    const labs = [...new Set(computers.map(c => c.lab))];
+    const labs = [...new Set(computers.map(c => c.lab_number))].filter(Boolean);
 
     if (isLoading) return <div className="animate-pulse h-64 bg-slate-800/50 rounded-2xl w-full"></div>;
 
@@ -79,7 +79,7 @@ const LabMap = ({ activeToken }) => {
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass-panel border-slate-700/50 p-6 rounded-2xl relative overflow-hidden max-w-[1600px] mx-auto w-full"
+            className="glass-panel border-slate-700/50 p-6 rounded-2xl relative overflow-hidden"
         >
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
@@ -103,16 +103,16 @@ const LabMap = ({ activeToken }) => {
                 variants={containerVariants}
                 initial="hidden"
                 animate="visible"
-                className="flex flex-wrap justify-center gap-6 xl:gap-8 items-start"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 w-full"
             >
                 {labs.map(labName => (
-                    <motion.div variants={itemVariants} key={labName} className="bg-slate-900/40 border border-slate-800 rounded-xl p-5 w-full sm:max-w-sm md:max-w-md shadow-lg hover:shadow-slate-800/50 transition-shadow">
-                        <h4 className="text-slate-400 font-bold mb-4 text-sm tracking-widest uppercase flex items-center gap-2">
+                    <motion.div variants={itemVariants} key={labName} className="bg-slate-900/40 border border-slate-800 rounded-xl p-4 w-full transition-shadow">
+                        <h4 className="text-slate-400 font-semibold mb-4 text-sm tracking-wider uppercase flex items-center gap-2">
                             <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.6)]"></span>
                             {labName}
                         </h4>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-2 gap-3 xl:gap-4">
-                            {computers.filter(c => c.lab === labName).map(pc => {
+                        <div className="grid grid-cols-2 gap-3">
+                            {computers.filter(c => c.lab_number === labName).map(pc => {
                                 const status = getPCStatus(pc.computer_id);
                                 return (
                                     <motion.div
