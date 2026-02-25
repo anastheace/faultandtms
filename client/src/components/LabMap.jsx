@@ -42,7 +42,7 @@ const LabMap = ({ activeToken }) => {
         const activeFault = tickets.find(t => t.computer_id === computerId && (t.status === 'open' || t.status === 'in_progress'));
         if (activeFault) return { state: 'fault', data: activeFault };
 
-        const activeUsage = usage.find(u => u.computer_id === computerId && !u.logout_time && ['student', 'staff'].includes(u.role.toLowerCase()));
+        const activeUsage = usage.find(u => u.computer_id === computerId && !u.logout_time);
         if (activeUsage) return { state: 'in_use', data: activeUsage };
 
         return { state: 'available', data: null };
@@ -58,7 +58,7 @@ const LabMap = ({ activeToken }) => {
     };
 
     // Grouping computers by Lab
-    const labs = [...new Set(computers.map(c => c.lab_number))].filter(Boolean);
+    const labs = [...new Set(computers.map(c => c.lab_number))].filter(lab => lab && lab.toLowerCase() !== 'unknown');
 
     if (isLoading) return <div className="animate-pulse h-64 bg-slate-800/50 rounded-2xl w-full"></div>;
 
