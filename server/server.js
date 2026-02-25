@@ -19,13 +19,13 @@ app.use('/api/maintenance', require('./routes/maintenanceRoutes'));
 // app.use('/api/users', require('./routes/userRoutes'));
 
 const path = require('path');
-const runHardwareTelemetry = require('./cron/telemetry');
+const initTelemetry = require('./cron/telemetry');
 
 // Serve static frontend files in production
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Initialize background hardware monitoring
-runHardwareTelemetry();
+initTelemetry();
 
 // React Router Fallback: Send all other unhandled requests to the React app
 app.use((req, res, next) => {

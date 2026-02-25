@@ -60,4 +60,54 @@ const runHardwareTelemetry = () => {
     }, 48 * 60 * 60 * 1000); // 48 hours in milliseconds
 };
 
-module.exports = runHardwareTelemetry;
+const runSimulatedTraffic = () => {
+    // Run every 10 minutes (600,000 ms) to keep the system active
+    setInterval(() => {
+        // 1. Get the generic Student user
+        db.get("SELECT id FROM users WHERE role = 'student' LIMIT 1", (err, student) => {
+            if (err || !student) return;
+
+            // 2. Pick a random operational computer
+            db.all("SELECT id, computer_id FROM computers WHERE status = 'operational'", [], (err, computers) => {
+                if (err || computers.length === 0) return;
+
+                const randomPc = computers[Math.floor(Math.random() * computers.length)];
+
+                // 3. Ensure this PC isn't already actively checked into
+                db.get("SELECT id FROM pc_usage_logs WHERE computer_id = ? AND logout_time IS NULL", [randomPc.id], (err, activeLog) => {
+                    if (err || activeLog) return; // Skip if someone is already using it
+
+                    // 4. Log the student in
+                    db.run("INSERT INTO pc_usage_logs (computer_id, user_id) VALUES (?, ?)", [randomPc.id, student.id], function (err) {
+                        if (err) return;
+                        const logId = this.lastID;
+
+                        // 5. Calculate a random checkout time between 30 and 150 minutes
+                        const minTime = 30 * 60 * 1000;
+                        const maxTime = 150 * 60 * 1000;
+                        const checkoutDelay = Math.floor(Math.random() * (maxTime - minTime + 1)) + minTime;
+                        const checkoutMins = Math.round(checkoutDelay / 60000);
+
+                        console.log(`[Simulated Traffic] Phantom Student checked into ${randomPc.computer_id}. Scheduled auto-checkout in ${checkoutMins} minutes.`);
+
+                        // 6. Schedule the checkout
+                        setTimeout(() => {
+                            db.run("UPDATE pc_usage_logs SET logout_time = CURRENT_TIMESTAMP WHERE id = ?", [logId], (err) => {
+                                if (!err) {
+                                    console.log(`[Simulated Traffic] Phantom Student completed ${checkoutMins}m session and logged out of ${randomPc.computer_id}.`);
+                                }
+                            });
+                        }, checkoutDelay);
+                    });
+                });
+            });
+        });
+    }, 10 * 60 * 1000); // 10 minutes
+};
+
+const initTelemetry = () => {
+    runHardwareTelemetry();
+    runSimulatedTraffic();
+};
+
+module.exports = initTelemetry;
