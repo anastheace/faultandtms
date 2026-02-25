@@ -73,7 +73,7 @@ const Dashboard = () => {
                 const resolved = tickets.filter(t => t.status === 'resolved').length;
 
                 const logs = usageRes.data;
-                const activePCs = logs.filter(l => !l.logout_time).length;
+                const activePCs = logs.filter(l => !l.logout_time && ['student', 'staff'].includes(l.role?.toLowerCase())).length;
 
                 setStats({ total, pending, resolved, activePCs });
                 setMaintenanceLogs(maintRes.data.slice(0, 4));
