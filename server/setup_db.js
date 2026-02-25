@@ -1,3 +1,11 @@
+const fs = require('fs');
+const path = require('path');
+const dbPath = path.resolve(__dirname, 'database.sqlite');
+
+if (fs.existsSync(dbPath)) {
+  try { fs.unlinkSync(dbPath); } catch (e) { }
+}
+
 const db = require('./config/db');
 
 const initializeDatabase = () => {

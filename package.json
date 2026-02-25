@@ -4,7 +4,7 @@
     "description": "TMS Smart Trip Monorepo",
     "scripts": {
         "start": "node server/server.js",
-        "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server && cd server && node patch_db.js",
+        "build": "npm install --prefix client && npm run build --prefix client && npm install --prefix server && cd server && node setup_db.js",
         "install-all": "npm install --prefix client && npm install --prefix server",
         "dev": "npm-run-all --parallel dev:client dev:server",
         "dev:client": "npm run dev --prefix client",
