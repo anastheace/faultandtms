@@ -60,9 +60,19 @@ const runHardwareTelemetry = () => {
     }, 48 * 60 * 60 * 1000); // 48 hours in milliseconds
 };
 
+const axios = require('axios');
+
 const runSimulatedTraffic = () => {
     // Run every 10 minutes (600,000 ms) to keep the system active
     setInterval(() => {
+        // --- RENDER WAKE-UP PING ---
+        // Render Free Tier spins down after 15 mins of no *incoming HTTP traffic*. 
+        // Internal setTimeout/DB queries do NOT count. We must explicitly ping our own public URL.
+        const appUrl = process.env.RENDER_EXTERNAL_URL || 'http://localhost:5000';
+        axios.get(`${appUrl}/api/usage/computers`)
+            .then(() => console.log(`[Self-Ping] Successfully pinged ${appUrl} to prevent Render sleep timer.`))
+            .catch(err => console.error(`[Self-Ping Failed] Could not ping ${appUrl}:`, err.message));
+
         // 1. Get the generic Student user
         db.get("SELECT id FROM users WHERE role = 'student' LIMIT 1", (err, student) => {
             if (err || !student) return;
