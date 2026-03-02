@@ -39,7 +39,7 @@ const LabMap = ({ activeToken }) => {
     }, [activeToken]);
 
     const getPCStatus = (computerId) => {
-        const activeFault = tickets.find(t => t.computer_id === computerId && (t.status === 'open' || t.status === 'in_progress'));
+        const activeFault = tickets.find(t => t.pc === computerId && (t.status === 'open' || t.status === 'in_progress'));
         if (activeFault) return { state: 'fault', data: activeFault };
 
         const activeUsage = usage.find(u => u.computer_id === computerId && !u.logout_time && ['student', 'staff'].includes(u.role?.toLowerCase()));
